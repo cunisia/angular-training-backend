@@ -5,6 +5,8 @@ const port = 3000;
 
 // Enable CORS for requests from everywhere
 app.use(cors());
+// Parse request body as JSON
+app.use(express.json())
 
 const housingLocations = [
   {
@@ -118,6 +120,17 @@ app.get('/housing-location/:id', (req, res) => {
   const location = housingLocations.find(loc => loc.id === id);
   if (location) {
     res.json(location);
+  } else {
+    res.status(404).json({ error: 'Housing location not found' });
+  }
+});
+
+app.patch('/housing-location/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const locationIdx = housingLocations.findIndex(loc => loc.id === id);
+  if (locationIdx !== -1) {
+    housingLocations[locationIdx] = {id, photo: housingLocations[locationIdx].photo, ...req.body.payload}
+    res.json(housingLocations[locationIdx]);
   } else {
     res.status(404).json({ error: 'Housing location not found' });
   }
